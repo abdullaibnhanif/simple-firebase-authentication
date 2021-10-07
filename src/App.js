@@ -1,4 +1,4 @@
-import { getAuth, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail } from "firebase/auth";
 import { useState } from "react";
 
 import './App.css';
@@ -91,6 +91,7 @@ function App() {
       .then(result => {
         const user = result.user;
         console.log(user);
+        setError('');
       })
       .catch(error => {
         setError(error.message);
@@ -103,9 +104,24 @@ function App() {
         const user = result.user;
         console.log(user);
         setError('');
+        verifyEmail();
       })
       .catch(error => {
         setError(error.message);
+      })
+  }
+
+  const verifyEmail = () => {
+    sendEmailVerification(auth.currentUser)
+      .then(result => {
+        console.log(result);
+      })
+  }
+
+  const handleResetPassword = () => {
+    sendPasswordResetEmail(auth, email)
+      .then(result => {
+
       })
   }
 
@@ -138,6 +154,7 @@ function App() {
         </div>
         <div className="row mb-3 text-danger">{error}</div>
         <button type="submit" className="btn btn-primary">{isLogin ? 'Login' : 'Register'}</button>
+        <button type="button" onClick={handleResetPassword} className="btn btn-secondary btn-sm">Reset Password</button>
       </form>
       <br />
       <div>-----------------------------</div>
