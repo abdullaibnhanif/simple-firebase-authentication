@@ -1,4 +1,4 @@
-import { getAuth, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail } from "firebase/auth";
+import { getAuth, signInWithPopup, GoogleAuthProvider, GithubAuthProvider, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, updateProfile } from "firebase/auth";
 import { useState } from "react";
 
 import './App.css';
@@ -10,6 +10,7 @@ const googleProvider = new GoogleAuthProvider();
 const gitHubProvider = new GithubAuthProvider();
 
 function App() {
+  const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -105,12 +106,16 @@ function App() {
         console.log(user);
         setError('');
         verifyEmail();
+        setUserName();
       })
       .catch(error => {
         setError(error.message);
       })
   }
-
+  const setUserName = () => {
+    updateProfile(auth.currentUser, { displayName: name })
+      .then(result => { console.log(result) });
+  }
   const verifyEmail = () => {
     sendEmailVerification(auth.currentUser)
       .then(result => {
@@ -125,11 +130,21 @@ function App() {
       })
   }
 
+  const handleNameChange = (e) => {
+    setName(e.target.Value);
+  }
+
   return (
     <div className="m-5">
 
       <form onSubmit={handleRegistration}>
         <h3>Please {isLogin ? 'Login' : 'Register'}</h3>
+        {!isLogin && <div className="row mb-3">
+          <label htmlFor="inputName" className="col-sm-2 col-form-label">Name</label>
+          <div className="col-sm-10">
+            <input type="text" onBlur={handleNameChange} className="form-control" id="inputName" placeholder="Your Name" />
+          </div>
+        </div>}
         <div className="row mb-3">
           <label htmlFor="inputEmail3" className="col-sm-2 col-form-label">Email</label>
           <div className="col-sm-10">
@@ -153,8 +168,8 @@ function App() {
           </div>
         </div>
         <div className="row mb-3 text-danger">{error}</div>
-        <button type="submit" className="btn btn-primary">{isLogin ? 'Login' : 'Register'}</button>
-        <button type="button" onClick={handleResetPassword} className="btn btn-secondary btn-sm">Reset Password</button>
+        <button type="submit" className="btn btn-primary my-3">{isLogin ? 'Login' : 'Register'}</button> <br />
+        <button type="button" onClick={handleResetPassword} className="btn btn-primary">Reset Password</button>
       </form>
       <br />
       <div>-----------------------------</div>
